@@ -29,32 +29,12 @@ a
 
 rm(list=ls())
 data<-c(rep(1,140), rep(0,110))
-prior.tmp<-rep(NA,3000)
-dim(prior.tmp)<-c(1000,3)
-prior.tmp[,1]<-runif(1000)
-prior.tmp[,2]<-10000
+prior.tmp<-rep(NA,30000)
+dim(prior.tmp)<-c(10000,3)
+prior.tmp[,1]<-runif(10000)
+prior.tmp[,2]<-1
 
 for (i in 1:length(data)){
-  if
-  prior.tmp[,3]<-
-    
-    
-}
-a<-(2:100)
-b<-102
-c<-(b/a)-floor(b/a)
-
-if(c!=0){
-  next
-}else {
-  testvalue<-1
-}
-
-for (i in 1:length(data)){
-  post<-abs((1-data[i])-prior)*conf
-}
-#just need a starting point and then multiply each one by the prior for each loop.
-#you don't update each time you loop only repeat the multiplication with the prior or
-#1-prior depending on the data.so you get post= prior^140*(prior-1)^110 if you have 140 heads and 
-#110 tails. Check the webcast again.
-
+  prior.tmp[,2]<-abs((1-data[i])-prior.tmp[,1])*prior.tmp[,2]
+  }
+plot(prior.tmp[,1], prior.tmp[,2])
