@@ -37,4 +37,9 @@ prior.tmp[,2]<-1
 for (i in 1:length(data)){
   prior.tmp[,2]<-abs((1-data[i])-prior.tmp[,1])*prior.tmp[,2]
   }
-plot(prior.tmp[,1], prior.tmp[,2])
+
+prior.tmp[,3]<-prior.tmp[,2]/sum(prior.tmp[,2])
+
+plot(prior.tmp[,1], prior.tmp[,3])
+
+
