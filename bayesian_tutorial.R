@@ -60,10 +60,10 @@ posterior<-prior.tmp
 #This is the sum of all likelihoods
 sum(posterior[,3])
 #This is the sum in a small range around 0.5
-sum(posterior[,3][(posterior[,1]>0.4)&(posterior[,1]<0.6)])
+sum(posterior[,3][(posterior[,1]>0.4979908)&(posterior[,1]<0.620111)])
 #The most likely value is the centre of max of the posterior distribution and
 #it is calculated as follows:
-sum(posterior[,1]*posterior[,3])
+mlv<-sum(posterior[,1]*posterior[,3])
 #This means that the most likely probability heads for this coin given the
 #observed evidence is 0.5595 which is equivalent to the proportion of heads in
 #the evidence because the pror distribution we started with was a uniform
@@ -77,16 +77,31 @@ posterior[,2]<-seq(from=1,to=10000, length=10000)
 
 for (i in 1:10000) {
   a<-sum(posterior[,3][(posterior[,2]<=i)])
-  
+  if (a<0.025) {
+    b<-1
+    next
+  }
+  else {
+    low_95<-posterior[i,1]
+    break
+  }
 }
 
+posterior[,2]<-seq(from=10000,to=1, length=10000)
 
+for (i in 1:10000) {
+  a<-sum(posterior[,3][(posterior[,2]<=i)])
+  if (a<0.025) {
+    b<-1
+    next
+  }
+  else {
+    upper_95<-posterior[10000-i,1]
+    break
+  }
+}
 
-
-
-
-
-
+cat("\n", "The most likely value for the coin is", mlv, "and it is 95% likely","\n", "that is has a value between", low_95, "and", upper_95)
 
 
 
