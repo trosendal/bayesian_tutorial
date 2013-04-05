@@ -1,5 +1,3 @@
-# Hello world
-
 # Question 1: does die10 show a bigger value than die6?
 
 rm(list=ls())
@@ -39,10 +37,10 @@ dim(prior.tmp)<-c(10000,3)
 #Option 2 A uniform prior build by a sequence of equally spaced numbers
 #this is better than the uniform distribution because of the pure
 #uniformity of the numbers
-prior.tmp[,1]<-seq(from=0.01,to=0.99, length=10000)
+#prior.tmp[,1]<-seq(from=0.01,to=0.99, length=10000)
 
 #option 3 see what happens if you start with a normal prior
-#prior.tmp[,1]<-rnorm(10000, mean=0.5, sd=0.1)
+prior.tmp[,1]<-rnorm(10000, mean=0.5, sd=0.1)
 
 prior.tmp[,2]<-1
 
@@ -74,38 +72,18 @@ mlv<-sum(posterior[,1]*posterior[,3])
 #curve because we have probability summing to 1 we know that we are looking for
 #the point of 0.025 area on the right and 0.025 area on the left
 
-posterior[,2]<-seq(from=1,to=10000, length=10000)
-
-for (i in 1:10000) {
-  a<-sum(posterior[,3][(posterior[,2]<=i)])
-  if (a<0.025) {
-    b<-1
-    next
-  }
-  else {
-    low_95<-posterior[i,1]
-    break
-  }
+central_posterior <- function(posterior, ll=0.025, cnt=0.5, ul=0.975) {
+  if(!all(ll > 0, ll < 1, ul > ll, ul < 1))
+    stop("Out of range")
+  a<-cumsum(posterior[,3])
+  b<-(posterior[c(max(which(a < ll)),max(which(a < cnt)), min(which(a > ul)) ),1])
+  b<-c("lower95%", "Median", "Upper95%", b)
+  dim(b)<-c(3,2)
+  return(b)
+  #return(class(b))
 }
 
-posterior[,2]<-seq(from=10000,to=1, length=10000)
-
-for (i in 1:10000) {
-  a<-sum(posterior[,3][(posterior[,2]<=i)])
-  if (a<0.025) {
-    b<-1
-    next
-  }
-  else {
-    upper_95<-posterior[10000-i,1]
-    break
-  }
-}
-
-cat("\n", "The most likely value for the coin is", mlv, "and it is 95% likely","\n", "that is has a value between", low_95, "and", upper_95)
-
-
-
+central_posterior(posterior)
 
 
 
