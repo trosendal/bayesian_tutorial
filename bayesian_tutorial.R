@@ -106,6 +106,8 @@ cat("\n", "The most likely value for the coin is", mlv, "and it is 95% likely","
 
 
 
+
+
 # is Alice smarter?
 #Alice gets 780 on the SAT and bob gets 760
 #we have a prior distribution of SAT scores from the population
