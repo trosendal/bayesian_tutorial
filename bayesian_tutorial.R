@@ -37,10 +37,10 @@ dim(prior.tmp)<-c(10000,3)
 #Option 2 A uniform prior build by a sequence of equally spaced numbers
 #this is better than the uniform distribution because of the pure
 #uniformity of the numbers
-#prior.tmp[,1]<-seq(from=0.01,to=0.99, length=10000)
+prior.tmp[,1]<-seq(from=0.01,to=0.99, length=10000)
 
 #option 3 see what happens if you start with a normal prior
-prior.tmp[,1]<-rnorm(10000, mean=0.5, sd=0.1)
+#prior.tmp[,1]<-rnorm(10000, mean=0.5, sd=0.1)
 
 prior.tmp[,2]<-1
 
@@ -91,10 +91,42 @@ central_posterior(posterior)
 #Then we ask: Is alice smarter than bob. ie is alice more likely to 
 #correctly answer a question than bob
 
-#Now we can reformulate the question and ask if the coin is biased in a different way
-#the coin could be in a range. We don't know where in the range but
-#could ask if it is in the range. Let's say we want to know if the liklihood of the 
-#coin being anywhere between 0 and 1 is greater than the likelihood of the coin being 0.5
+
+#First the distributions of the  rest of the students that took the test. The prior
+
+library("stringr")
+
+temp_a<-(read.table("H:/bayesian_tutorial/sat_ranks.csv", sep=",", colClasses = "character"))[4:64,1:2]
+prior_a<-as.numeric(c(temp_a$V1, temp_a$V2))
+dim(prior_a)<-c(61,2)
+prior_a<-as.data.frame(prior_a)
+plot(prior_a[,1], prior_a[,2])
+
+matchscorelist<-(read.table("H:/bayesian_tutorial/sat_scale.csv", sep=",", colClasses = "character"))[6:18, 3:4]
+matchscorelist
+c.tmp<-(str_split(matchscorelist$V4, "-"))
+d.tmp<-sapply(c.tmp, function(item){
+  as.numeric(item[1])  
+})
+e.tmp<-sapply(c.tmp, function(item){
+  as.numeric(item[2])  
+})
+f.tmp<-(d.tmp+e.tmp)/2
+f.tmp[1]<-d.tmp[1]
+f.tmp[13]<-d.tmp[13]
+matchscorelist$V4<-f.tmp
+matchscorelist$V3<-as.numeric(matchscorelist$V3)
+
+plot(glm(matchscorelist$V3~matchscorelist$V4)$fitted.values, matchscorelist$V4, type="l")
+a.tmp<-((0:60)+20)*10
+b.tmp<-round(((glm(matchscorelist$V3~matchscorelist$V4)$coefficients)[1])+((glm(matchscorelist$V3~matchscorelist$V4)$coefficients)[2])*a.tmp)
+prior_a$V3<-rev(b.tmp)
+names(prior_a)<-c("score", "freq", "num_correct")
+
+plot(prior_a$num_correct, prior_a$freq)
+
+#Alice got 780 and Bob got 760, we now know from the prior_a object that this corresponds to Bob 
+#answering 53/57 correct and Alice 55/57. These are then the values we will use to update the prior
 
 
 
