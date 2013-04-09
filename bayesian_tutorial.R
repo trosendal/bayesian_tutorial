@@ -85,8 +85,6 @@ central_posterior <- function(posterior, ll=0.025, cnt=0.5, ul=0.975) {
 
 central_posterior(posterior)
 
-
-
 # is Alice smarter?
 #Alice gets 780 on the SAT and bob gets 760
 #we have a prior distribution of SAT scores from the population
@@ -97,3 +95,6 @@ central_posterior(posterior)
 #the coin could be in a range. We don't know where in the range but
 #could ask if it is in the range. Let's say we want to know if the liklihood of the 
 #coin being anywhere between 0 and 1 is greater than the likelihood of the coin being 0.5
+
+
+
