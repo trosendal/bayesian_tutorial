@@ -95,6 +95,8 @@ central_posterior(posterior)
 #First the distributions of the  rest of the students that took the test. The prior
 
 library("stringr")
+library("ggplot2")
+rm(list=ls())
 
 temp_a<-(read.table("H:/bayesian_tutorial/sat_ranks.csv", sep=",", colClasses = "character"))[4:64,1:2]
 prior_a<-as.numeric(c(temp_a$V1, temp_a$V2))
@@ -121,12 +123,62 @@ plot(glm(matchscorelist$V3~matchscorelist$V4)$fitted.values, matchscorelist$V4, 
 a.tmp<-((0:60)+20)*10
 b.tmp<-round(((glm(matchscorelist$V3~matchscorelist$V4)$coefficients)[1])+((glm(matchscorelist$V3~matchscorelist$V4)$coefficients)[2])*a.tmp)
 prior_a$V3<-rev(b.tmp)
-names(prior_a)<-c("score", "freq", "num_correct")
+prior_a$V4<-prior_a$V3/max(prior_a$V3)
+names(prior_a)<-c("score", "freq", "num_correct", "fraction")
 
-plot(prior_a$num_correct, prior_a$freq)
+
+plot(prior_a$fraction, prior_a$freq)
 
 #Alice got 780 and Bob got 760, we now know from the prior_a object that this corresponds to Bob 
 #answering 53/57 correct and Alice 55/57. These are then the values we will use to update the prior
 
+data.alice<-c(rep(1,55), rep(0,2))
+data.bob<-c(rep(1,53), rep(0,4))
 
 
+#The level of confidence in a given hypothesis in the prior is given by the frequency in the prior distribution
+
+prior_alice<-prior_a
+for (i in 1:length(data.alice)){
+  prior_alice$freq<-abs((1-data.alice[i])-prior_alice$fraction)*prior_alice$freq
+}
+#now normalize by deviding by the total amount of remaining confidence
+prior_alice$posterior<-prior_alice$freq/sum(prior_alice$freq)
+#And plot the confidence by hypothesis for the posterior distribution
+plot(prior_alice$fraction, prior_alice$posterior, type="l")
+posterior_alice<-prior_alice
+
+prior_bob<-prior_a
+for (i in 1:length(data.bob)){
+  prior_bob$freq<-abs((1-data.bob[i])-prior_bob$fraction)*prior_bob$freq
+}
+#now normalize by deviding by the total amount of remaining confidence
+prior_bob$posterior<-prior_bob$freq/sum(prior_bob$freq)
+#And plot the confidence by hypothesis for the posterior distribution
+plot(prior_bob$fraction, prior_bob$posterior, type="l")
+posterior_bob<-prior_bob
+
+#Now compare the posteriors
+
+plot(prior_alice$fraction, prior_alice$posterior, type="l", col="red")
+lines(prior_bob$fraction, prior_bob$posterior, col="black")
+
+#It appears that the two posteriors are not that different. most of their area overlaps. How much overlap is there and are the central 
+#values significantly different
+
+
+#95% credibility interval for Bob is
+
+central_posterior <- function(posterior, ll=0.025, cnt=0.5, ul=0.975) {
+  if(!all(ll > 0, ll < 1, ul > ll, ul < 1))
+    stop("Out of range")
+  a<-cumsum(posterior[,5])
+  b<-(posterior[c(max(which(a < ll)),max(which(a < cnt)), min(which(a > ul)) ),3])
+  b<-c("lower95%", "Median", "Upper95%", b)
+  dim(b)<-c(3,2)
+  return(b)
+  #return(class(b))
+}
+
+central_posterior(posterior_bob)
+central_posterior(posterior_alice)
